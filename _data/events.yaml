@@ -1,4 +1,18 @@
 
+- time: 2026-02-23 17:00:00
+  title: "How to Become an AI Engineer After a Career Break"
+  speakers: [revathyramalingam]
+  type: podcast
+  link: https://luma.com/gui2su2f
+
+
+- time: 2026-03-03 17:00:00
+  title: "Vibe Coding: Build a Game with AI"
+  speakers: [alekseykomissarov]
+  type: workshop
+  link: https://luma.com/4stc4gir
+
+
 - time: 2026-03-10 17:00:00
   title: "Context Engineering for Agentic Hybrid Applications"
   speakers: [ivanpotapov, tobiaslindenbauer]
