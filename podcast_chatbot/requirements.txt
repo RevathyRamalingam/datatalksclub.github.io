@@ -1,4 +1,4 @@
 groq
-youtube-transcript-api
 minsearch
 python-dotenv
+PyYAML
