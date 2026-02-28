@@ -24,7 +24,7 @@ GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
 
 ### 5. Run!
 ```bash
-python chatbot.py
+streamlit run streamlit_chatbot.py 
 ```
 
 ---
