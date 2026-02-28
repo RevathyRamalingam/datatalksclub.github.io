@@ -20,13 +20,7 @@ Go to https://console.groq.com → sign up → API Keys → Create Key
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
 ```
 
-### 4. Put your .md files in the `episodes/` folder
-```
-episodes/
-  ai-in-healthcare.md
-  another-episode.md
-  ...
-```
+### 4. The .md files containing transcripts are loaded from the `_podcast/` folder
 
 ### 5. Run!
 ```bash
@@ -59,7 +53,6 @@ You: How does the personalization recommender system work?
 | `rag_pipeline.py` | Connects search → Groq LLM → answer |
 | `chatbot.py` | Interactive terminal chatbot |
 | `.env` | Your Groq API key |
-| `episodes/` | Put your .md podcast files here |
 
 ---
 
