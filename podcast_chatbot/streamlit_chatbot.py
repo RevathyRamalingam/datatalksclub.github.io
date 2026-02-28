@@ -334,38 +334,6 @@ with st.sidebar:
     st.markdown(f"<span class='badge'>RAG · minsearch · Groq</span>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Scope selector
-    st.markdown("**🔍 Search scope**")
-
-    if st.button("🌐 All Episodes", use_container_width=True):
-        st.session_state.video_id_filter = None
-
-    st.markdown("**📺 Or pick an episode:**")
-    for ep in episodes:
-        label = f"S{ep['season']}E{ep['episode_num']}" if ep["season"] else "EP"
-        is_active = st.session_state.video_id_filter == ep["video_id"]
-        card_class = "episode-card active" if is_active else "episode-card"
-        # Streamlit button per episode
-        btn_label = f"{'▶ ' if is_active else ''}{ep['title'][:45]}{'…' if len(ep['title']) > 45 else ''}"
-        if st.button(btn_label, key=f"ep_{ep['video_id']}", use_container_width=True):
-            st.session_state.video_id_filter = ep["video_id"]
-
-    st.markdown("---")
-
-    # Current scope badge
-    if st.session_state.video_id_filter:
-        active_ep = next((e for e in episodes if e["video_id"] == st.session_state.video_id_filter), None)
-        scope_label = active_ep["title"] if active_ep else st.session_state.video_id_filter
-        st.markdown(f"<span class='badge badge-active'>▶ {scope_label[:30]}…</span>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"<span class='badge badge-active'>🌐 All {len(episodes)} episodes</span>", unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # Debug toggle
-    st.session_state.debug_mode = st.toggle("🛠️ Debug mode", value=st.session_state.debug_mode)
-
-    # Clear chat
     if st.button("🗑️ Clear chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
@@ -406,7 +374,7 @@ with col2:
     send = st.button("Send →", use_container_width=True)
 
 # Handle send
-if (send or user_input) and user_input.strip():
+if send and user_input.strip():
     raw_query   = user_input.strip()
     clean_query = normalize_query(raw_query, vocab)
 
