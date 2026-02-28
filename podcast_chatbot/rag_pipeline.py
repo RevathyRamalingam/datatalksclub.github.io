@@ -28,7 +28,7 @@ class PodcastRAG:
         self,
         index,
         segments:   list[dict],
-        model:      str = "llama3-8b-8192",  # free Groq model
+        model:      str = "llama-3.3-70b-versatile",  # free Groq model
         top_k:      int = 5,
     ):
         """

@@ -24,10 +24,49 @@ from dotenv import load_dotenv
 # Load .env so GROQ_API_KEY is available before any imports that need it
 load_dotenv()
 
-from md_parser    import load_all_episodes
+from md_parser import load_all_episodes
 from search_index import build_index
 from rag_pipeline import PodcastRAG
+import re
+from rapidfuzz import process, fuzz
 
+def normalize_query(query: str, vocab: set[str]) -> str:
+    """
+    For each token in query, check if merging it with the next token
+    produces a word that exists in the corpus vocabulary.
+    Falls back to fuzzy match if exact merge isn't in vocab.
+    """
+    query = query.lower().strip()
+    query = re.sub(r'[^\w\s]', ' ', query)
+    query = re.sub(r'\s+', ' ', query)
+    
+    tokens = query.split()
+    merged = []
+    i = 0
+    
+    while i < len(tokens):
+        if i + 1 < len(tokens):
+            combined = tokens[i] + tokens[i + 1]
+            
+            if combined in vocab:
+                # Exact match in corpus → definitely merge
+                merged.append(combined)
+                i += 2
+                continue
+            
+            # Fuzzy check: is the combined form close to any vocab word?
+            match, score, _ = process.extractOne(
+                combined, vocab, scorer=fuzz.ratio
+            )
+            if score >= 85:  # high confidence it's a split word
+                merged.append(match)  # use the actual vocab word
+                i += 2
+                continue
+        
+        merged.append(tokens[i])
+        i += 1
+    
+    return " ".join(merged)
 
 # ─────────────────────────────────────────────
 # Startup
@@ -117,7 +156,13 @@ def select_episode(segments: list[dict]) -> str | None:
         print("⚠️  Not a number — searching all episodes.\n")
         return None
 
-
+def build_vocabulary(all_chunks: list[dict]) -> set[str]:
+    """Extract all unique words from your indexed chunks."""
+    vocab = set()
+    for chunk in all_chunks:
+        words = re.findall(r'\b\w+\b', chunk["text"].lower())
+        vocab.update(words)
+    return vocab
 # ─────────────────────────────────────────────
 # Chat loop
 # ─────────────────────────────────────────────
@@ -127,6 +172,7 @@ def chat_loop(rag: PodcastRAG, segments: list[dict]) -> None:
     
     video_id_filter = None  # None = search all
     debug_mode      = False
+    vocab = build_vocabulary(segments)
     
     print("\n💬 Ask anything about the podcast!")
     print("   Commands: /episode  /all  /list  /debug  /quit")
@@ -153,6 +199,7 @@ def chat_loop(rag: PodcastRAG, segments: list[dict]) -> None:
             continue
         
         cmd = user_input.lower()
+        user_input = normalize_query(user_input, vocab)
         
         # ── Commands ──────────────────────────────
         
@@ -217,7 +264,7 @@ def main():
     parser = argparse.ArgumentParser(description="Podcast RAG Chatbot")
     parser.add_argument(
         "--episodes",
-        default="./episodes",
+        default="../_podcast/",
         help="Directory containing your .md episode files (default: ./episodes)",
     )
     args = parser.parse_args()

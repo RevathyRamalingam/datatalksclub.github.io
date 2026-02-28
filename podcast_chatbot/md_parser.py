@@ -396,7 +396,12 @@ def load_all_episodes(episodes_dir: str = "./episodes") -> list[dict]:
             f"Create it and put your .md files inside."
         )
     
-    md_files = sorted(episodes_path.glob("**/*.md"))
+    SKIP_FILES = {"_template.md"}  # add more here if needed
+
+    md_files = sorted(
+        f for f in episodes_path.glob("**/*.md")
+        if f.name not in SKIP_FILES
+    )
     
     if not md_files:
         raise ValueError(f"No .md files found in {episodes_dir}")
@@ -421,6 +426,8 @@ def load_all_episodes(episodes_dir: str = "./episodes") -> list[dict]:
     return all_segments
 
 
+
+
 # ─────────────────────────────────────────────────────────────
 # Quick test — run this file directly
 # ─────────────────────────────────────────────────────────────
@@ -429,14 +436,19 @@ if __name__ == "__main__":
     import json, sys
     
     # Pass a file path as argument, or use the default test path
-    filepath = sys.argv[1] if len(sys.argv) > 1 else "./episodes/ai-in-healthcare.md"
+    filepath = "../_podcast/"
     
     if not os.path.exists(filepath):
         print(f"File not found: {filepath}")
         print("Usage: python md_parser.py path/to/episode.md")
         sys.exit(1)
     
-    segments = parse_md_file(filepath)
+    # Handle both file and directory input
+    if os.path.isdir(filepath):
+        segments = load_all_episodes(filepath)
+    else:
+        segments = parse_md_file(filepath)
+    build_vocalbulary(segments)
     
     print(f"\n=== Sample Header Chunk ===")
     header_samples = [s for s in segments if s["chunk_type"] == "header"]

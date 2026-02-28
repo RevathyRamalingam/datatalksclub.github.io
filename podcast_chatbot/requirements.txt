@@ -2,3 +2,5 @@ groq
 minsearch
 python-dotenv
 PyYAML
+rapidfuzz
+streamlit
